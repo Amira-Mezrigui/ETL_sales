@@ -1,0 +1,23 @@
+version : '3.8'
+
+services:
+    db: 
+      image: alpine:latest
+      command: sh -c "apk --no-cache add sqlite && tail -f /dev/null"
+      volumes:
+        - ./database:/data
+      container_name: sqlite-container
+      # If sqlite3's container is down , docker-compose will restart it automatically
+      restart: always
+
+    etl:
+      # to guarantee that the database run before the etl 
+      depends_on:
+      - db
+      build: .
+      restart: always
+      volumes:
+        - ./database:/data
+      container_name: etl-container
+volumes:
+  database : {}
